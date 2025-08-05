@@ -48,6 +48,12 @@
       border: 1px solid #ffeeba;
       border-radius: 5px;
     }
+    .hint {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -55,7 +61,8 @@
     <h2>Unified Rent Calculator</h2>
 
     <label>Monthly Salary (₦)</label>
-    <input type="number" id="salary" placeholder="e.g. 300000" />
+    <input type="number" id="salary" placeholder="e.g. 300000" oninput="updateMaxLoanHint()" />
+    <div class="hint" id="salaryHint"></div>
 
     <label>Requested Financing Amount (₦)</label>
     <input type="number" id="requestedAmount" placeholder="e.g. 800000" />
@@ -84,6 +91,17 @@
   <script>
     function formatCurrency(value) {
       return '₦' + value.toLocaleString();
+    }
+
+    function updateMaxLoanHint() {
+      const salary = parseFloat(document.getElementById('salary').value);
+      const hintDiv = document.getElementById('salaryHint');
+      if (!isNaN(salary)) {
+        const maxLoan = salary * 2.5;
+        hintDiv.textContent = `You can request up to ${formatCurrency(maxLoan)}`;
+      } else {
+        hintDiv.textContent = '';
+      }
     }
 
     function handleSubmit() {
