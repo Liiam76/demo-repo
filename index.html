@@ -1,3 +1,132 @@
-<div>Text 
-    <p>This is a paragraph</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unified Rent Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #111;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    .warning {
+      background: #fff3cd;
+      color: #856404;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Unified Rent Calculator</h2>
+
+    <label>Monthly Salary (₦)</label>
+    <input type="number" id="salary" placeholder="e.g. 300000" />
+
+    <label>Requested Financing Amount (₦)</label>
+    <input type="number" id="requestedAmount" placeholder="e.g. 800000" />
+
+    <label>Renewal Date</label>
+    <input type="date" id="renewalDate" />
+
+    <label>Repayment Period</label>
+    <select id="repaymentPeriod">
+      <option value="">Select Period</option>
+      <option value="6">6 months</option>
+      <option value="9">9 months</option>
+      <option value="12">12 months</option>
+    </select>
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="you@example.com" />
+
+    <button onclick="handleSubmit()">Calculate</button>
+
+    <div id="error" style="color: red;"></div>
+    <div id="result" class="result" style="display: none;"></div>
+    <div id="warning" class="warning" style="display: none;"></div>
+  </div>
+
+  <script>
+    function formatCurrency(value) {
+      return '₦' + value.toLocaleString();
+    }
+
+    function handleSubmit() {
+      const salary = parseFloat(document.getElementById('salary').value);
+      const requestedAmount = parseFloat(document.getElementById('requestedAmount').value);
+      const renewalDate = document.getElementById('renewalDate').value;
+      const repaymentPeriod = parseInt(document.getElementById('repaymentPeriod').value);
+      const email = document.getElementById('email').value;
+
+      const errorDiv = document.getElementById('error');
+      const resultDiv = document.getElementById('result');
+      const warningDiv = document.getElementById('warning');
+
+      errorDiv.textContent = '';
+      resultDiv.style.display = 'none';
+      warningDiv.style.display = 'none';
+
+      if (!salary || !requestedAmount || !renewalDate || !repaymentPeriod || !email) {
+        errorDiv.textContent = 'Please fill in all fields correctly.';
+        return;
+      }
+
+      const interestRates = { 6: 0.24, 9: 0.36, 12: 0.48 };
+      const interest = interestRates[repaymentPeriod];
+      const totalRepayment = requestedAmount * (1 + interest);
+      const monthlyRepayment = totalRepayment / repaymentPeriod;
+
+      if (monthlyRepayment > salary * 0.3333) {
+        warningDiv.style.display = 'block';
+        warningDiv.textContent = 'Please note, your loan amount is limited to ensure monthly payments do not exceed 33.33% of your salary.';
+        return;
+      }
+
+      const securityDeposit = monthlyRepayment;
+
+      resultDiv.innerHTML = `
+        <p><strong>Requested Amount:</strong> ${formatCurrency(requestedAmount)}</p>
+        <p><strong>Monthly Repayment:</strong> ${formatCurrency(monthlyRepayment)} / month</p>
+        <p><strong>Security Deposit:</strong> ${formatCurrency(securityDeposit)} <span title='This is refundable and equivalent to one month of your rent.'>🛈</span></p>
+        <button style='margin-top: 1rem;'>Sign up and access financing now</button>
+      `;
+      resultDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
